@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    pawgen (1.0.1)
+    thor (0.19.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  pawgen
+  thor
+
+BUNDLED WITH
+   1.11.2

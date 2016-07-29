@@ -1,0 +1,18 @@
+version: "2"
+services:
+  dnsdock:
+    image: tonistiigi/dnsdock
+    container_name: tk_dns
+    hostname: tk_dns
+    logging:
+      driver: "syslog"
+      options:
+        tag: "dns"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 172.17.0.1:53:53/udp
+      - 172.17.0.1:53:53/tcp
+    restart: always
+    command: -ttl=30 -environment="prod" -nameserver="192.168.101.1:53" -domain="<%= @clientname %>"
+    network_mode: bridge

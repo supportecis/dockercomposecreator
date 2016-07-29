@@ -1,0 +1,21 @@
+version: "2"
+services:
+  apache2:
+    image: registry.teikhos.eu/apache/tk-ubuntu-apache:2016031801
+    links: 
+      - phpfpm:phpfpm
+    volumes_from:
+      - phpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/log/apache2:/var/log/apache2
+      - /home/sites/<%= @fulldomain %>/conf/apache2:/etc/apache2
+    env_file: web.env
+    network_mode: bridge    
+  phpfpm:
+    image: registry.teikhos.eu/fpm/tk-ubuntu-fpm:2016032102
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/log/php-fpm:/var/log/php5-fpm
+      - /home/sites/<%= @fulldomain %>/conf/fpm:/etc/php5/fpm
+    env_file: fpm.env
+    network_mode: bridge

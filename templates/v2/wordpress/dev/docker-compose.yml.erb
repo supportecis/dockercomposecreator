@@ -1,0 +1,37 @@
+version: "2"
+services:
+  wpnginx:
+    image: registry.teikhos.eu/nginx/tk-ubuntu-nginx:2015082501
+    links: 
+      - wpphpfpm:php_fpm
+    volumes_from:
+      - wpphpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+      - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+    env_file: wpnginx.env
+    network_mode: bridge
+  wpphpfpm:
+    image: registry.teikhos.eu/fpm/tk-wordpress-fpm:2016030401
+    links: 
+      - wpdb:wpdb
+      - wpsmtp:wpsmtp
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/conf/php:/php_conf
+      - /home/sites/<%= @fulldomain %>/log/php5:/var/log/php5
+    env_file:
+      - wpfpm.env
+      - wpsmtp.env
+    network_mode: bridge
+  wpdb:
+    image: mariadb:10
+    volumes:
+      - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+    env_file: wpdb.env
+    network_mode: bridge
+  wpsmtp:
+    image: catatnight/postfix 
+    env_file: wpsmtp.env
+   network_mode: bridge
+   

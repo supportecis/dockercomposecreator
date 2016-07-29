@@ -1,0 +1,14 @@
+version: "2"
+services:
+  croncurl: 
+    image: registry.teikhos.eu/misc/tk-alpine-croncurl:latest
+    container_name: tk_croncurl
+    volumes: 
+      - /home/services/tk_croncurl/output:/output
+      - /home/services/tk_croncurl/config:/config
+    restart: always    
+    logging:
+      driver: "syslog"
+      options:
+        syslog-tag: "croncurl"      
+    network_mode: bridge

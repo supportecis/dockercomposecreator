@@ -1,0 +1,17 @@
+version: "2"
+services:
+  pma:
+    image: registry.teikhos.eu/phpmyadmin/tk-debian-phpmyadmin:latest
+    container_name: tk_pma
+    hostname: tk_pma
+    logging:
+      driver: "none"
+    volumes:
+      - /home/services/tk_pma/config:/var/www/html/multiconfigs
+    environment:
+      - VIRTUAL_HOST=pma.<%= @machine %>.<%= @clientname %>.as49517.net
+      # seulement si https - PMAABSOLUTEURI=https://pma.<%= @machine %>.<%= @clientname %>.as49517.net
+      - TZ=Europe/Paris
+      - DOCKER_GATEWAY=172.17.0.1     
+    network_mode: bridge
+    dns: 172.17.0.1

@@ -1,0 +1,29 @@
+version: "2"
+services:
+  apache:
+    image: registry.teikhos.eu/apache/tk-ubuntu-apache:wily
+    depends_on: 
+      - phpfpm
+    volumes_from:
+      - phpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/log/apache2:/var/log/apache2
+      - /home/sites/<%= @fulldomain %>/conf/apache2:/etc/apache2
+    environment:
+      TZ: Europe/Paris
+    networks:
+      proxy:
+        aliases:
+          - <%= @fulldomain %>.vhost
+      default:   
+  phpfpm:
+    image: registry.teikhos.eu/fpm/tk-ubuntu-fpm:wily
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/log/php-fpm:/var/log/php5-fpm
+      - /home/sites/<%= @fulldomain %>/conf/fpm:/etc/php5/fpm
+    env_file: fpm.env
+networks:
+  proxy:
+    external:
+      name: tkapacheproxy_main

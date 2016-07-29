@@ -1,0 +1,16 @@
+version: "2"
+services:
+  ssh:
+    image: atmoz/sftp
+    container_name: tk_sftp
+    hostname: tk_sftp
+    logging:
+      driver: "none"
+    ports:
+      - "2222:22"
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/home/u_<%= @project %>/<%= @fulldomain %>/web
+      - /home/sites/<%= @fulldomain %>/log:/home/u_<%= @project %>/<%= @fulldomain %>/logs:ro
+      - /home/sites/<%= @fulldomain %>/archives:/home/u_<%= @project %>/<%= @fulldomain %>/files
+    command: u_<%= @project %>:<%= @user_pass_sftp %>:33:33
+    network_mode: bridge

@@ -1,0 +1,49 @@
+version: "2"
+services:
+  wpnginx:
+    image: registry.teikhos.eu/nginx/tk-ubuntu-nginx:2016042101
+    depends_on:
+      - wpphpfpm
+    volumes_from:
+      - wpphpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+      - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+    env_file: wpnginx.env
+    networks:
+      proxy:
+        aliases:
+          - <%= @fulldomain %>.vhost
+      default:
+  wpphpfpm:
+    image: registry.teikhos.eu/fpm/tk-wordpress-fpm:2016041501
+    depends_on:
+      - wpdb
+      - wpsmtp    
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/conf/php:/php_conf
+      - /home/sites/<%= @fulldomain %>/log/php5:/var/log/php5
+    env_file:
+      - wpfpm.env
+      - wpsmtp.env
+  wpsmtp:
+    image: catatnight/postfix 
+    env_file: wpsmtp.env          
+  wpdb:
+    image: mariadb:10
+    volumes:
+      - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+    env_file: wpdb.env
+    networks:
+      default:
+      phpmyadmin:
+        aliases:
+          - <%= @fulldomain %>.db    
+networks:
+  proxy:
+    external:
+      name: tkapacheproxy_main
+  phpmyadmin:
+    external:
+      name: tkpma_main

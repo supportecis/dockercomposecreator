@@ -1,0 +1,34 @@
+version: "2"
+services:
+  nginx:
+    image: registry.teikhos.eu/nginx/tk-ubuntu-nginx:2016032501
+    links:
+      - phpfpm:php_fpm
+    volumes_from:
+      -  phpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+      - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+    env_file: web.env
+    network_mode: bridge 
+  phpfpm:
+    image: registry.teikhos.eu/fpm/tk-ubuntu-fpm:wily
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/conf/fpm:/etc/php5/fpm
+      - /home/sites/<%= @fulldomain %>/log/php5-fpm:/var/log/php5-fpm
+    links:
+      - postfix:smtp
+      - mariadb:sqldb
+    env_file: phpfpm.env
+    network_mode: bridge 
+  postfix:
+    image: catatnight/postfix
+    env_file: smtp.env
+    network_mode: bridge
+  mariadb:
+    image: mariadb:10
+    volumes:
+      - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+    env_file: db.env
+    network_mode: bridge

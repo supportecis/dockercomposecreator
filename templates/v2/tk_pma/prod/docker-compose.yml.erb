@@ -1,0 +1,18 @@
+version: "2"
+services:
+  pma:
+    image: registry.teikhos.eu/phpmyadmin/tk-debian-phpmyadmin:latest
+    container_name: tk_pma
+    hostname: tk_pma
+    logging:
+      driver: "none"
+    volumes:
+      - /home/sites/tk_pma/config:/var/www/html/multiconfigs
+    environment:
+      - VIRTUAL_HOST=pma.fruidor.cdc.as49517.net
+      - PMAABSOLUTEURI=http://pma.fruidor.cdc.as49517.net
+      - TZ=Europe/Paris
+      - DOCKER_GATEWAY=172.17.0.1      
+    restart: always
+    network_mode: bridge
+    dns: 172.17.0.1

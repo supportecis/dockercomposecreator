@@ -1,0 +1,66 @@
+wpnginx:
+  image: docker-registry.teikhos.eu/tk-ubuntu-nginx:2015082501
+  links:
+    - wpphpfpm:php_fpm
+  volumes_from:
+    - wpphpfpm
+  volumes:
+    - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+    - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+  env_file: wpnginx.env
+  restart: always
+  log_driver: "syslog"
+  log_opt:
+    syslog-tag: "<%= @project %>_web"
+  mem_limit: 256M
+wpphpfpm:
+  image: docker-registry.teikhos.eu/tk-wordpress-fpm:2015122101
+  links:
+    - wpdb:wpdb
+    - wpsmtp:wpsmtp
+  volumes:
+    - /home/sites/<%= @fulldomain %>/web:/var/www/html
+    - /home/sites/<%= @fulldomain %>/conf/php:/php_conf
+    - /home/sites/<%= @fulldomain %>/log/php5:/var/log/php5
+  env_file:
+    - wpfpm.env
+    - wpsmtp.env
+  restart: always
+  log_driver: "syslog"
+  log_opt:
+    syslog-tag: "<%= @project %>_phpfpm"
+  mem_limit: 256M
+wpdb:
+  image: mariadb:10
+  volumes_from:
+    - wpdbdata
+  env_file: wpdb.env
+  restart: always
+  log_driver: "none"
+wpdbdata:
+  image: mariadb:10
+  volumes:
+    - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+  command: echo "Image de DATA"
+  log_driver: "none"
+wpsmtp:
+  image: docker-registry.teikhos.eu/tk-postfix:2015120901
+  volumes :
+    - /home/sites/<%= @fulldomain %>/log/mail:/var/log/postfix
+    - /home/sites/<%= @fulldomain %>/conf/mail:/config
+  env_file: wpsmtp.env
+  restart: always
+  log_driver: "none"
+wpdbbackup:
+  image: docker-registry.teikhos.eu/tk-alpine-sqlbackup:latest
+  links:
+    - wpdb:hostdb
+    - wpsmtp:hostsmtp
+  volumes:
+    - /home/sites/<%= @fulldomain %>/dbbackups:/backups
+  env_file:
+    - wpdb.env
+    - wpbackup.env
+  restart: always
+  log_driver: "none"
+  

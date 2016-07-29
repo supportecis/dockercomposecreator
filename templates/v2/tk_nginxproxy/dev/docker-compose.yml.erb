@@ -1,0 +1,21 @@
+version: "2"
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: tk_nginxproxy
+    hostname: tk_nginxproxy
+    logging:
+      driver: "syslog"
+      options:
+        tag: "proxy"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /home/services/tk_nginxproxy/htpasswd:/etc/nginx/htpasswd:ro 
+      - /home/services/tk_nginxproxy/vhost.d:/etc/nginx/vhost.d:ro
+      - /home/services/tk_nginxproxy/certs:/etc/nginx/certs:ro
+      - /home/services/tk_nginxproxy/tk_proxy.conf:/etc/nginx/conf.d/tk_proxy.conf:ro 
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    network_mode: bridge

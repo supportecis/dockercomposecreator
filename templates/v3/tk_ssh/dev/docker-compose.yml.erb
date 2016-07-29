@@ -1,0 +1,14 @@
+version: "2"
+services:
+  ssh:
+    image: registry.teikhos.eu/ssh/tk-ssh:latest
+    container_name: tk_ssh
+    hostname: tk_ssh
+    logging:
+      driver: "none"
+    ports:
+      - "2223:22"
+    volumes:    
+      - /root/sshkeys/user_rsa.pub:/home/<%= @clientname %>/.ssh/keys/user_rsa.pub:ro
+    # enlever le mot de passe si on veut se connecter par clé
+    command: <%= @clientname %>:<%= @noreply_pass_smtp %>:33:33 

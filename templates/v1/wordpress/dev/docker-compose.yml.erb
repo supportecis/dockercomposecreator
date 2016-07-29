@@ -1,0 +1,31 @@
+wpnginx:
+  image: docker-registry.teikhos.eu/tk-ubuntu-nginx:2015082501
+  links: 
+    - wpphpfpm:php_fpm
+  volumes_from:
+   - wpphpfpm
+  volumes:
+   - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+   - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+  env_file: wpnginx.env
+wpphpfpm:
+  image: docker-registry.teikhos.eu/tk-wordpress-fpm:2015122101
+  links: 
+   - wpdb:wpdb
+   - wpsmtp:wpsmtp
+  volumes:
+   - /home/sites/<%= @fulldomain %>/web:/var/www/html
+   - /home/sites/<%= @fulldomain %>/conf/php:/php_conf
+   - /home/sites/<%= @fulldomain %>/log/php5:/var/log/php5
+  env_file:
+   - wpfpm.env
+   - wpsmtp.env
+wpdb:
+  image: mariadb:10
+  volumes:
+   - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+  env_file: wpdb.env
+wpsmtp:
+  image: catatnight/postfix 
+  env_file: wpsmtp.env
+  

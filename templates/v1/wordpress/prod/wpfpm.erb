@@ -1,0 +1,13 @@
+WORDPRESS_DB_HOST=wpdb
+WORDPRESS_DB_USER=wordpress
+WORDPRESS_DB_PASSWORD=<%= @user_pass_db %>
+WORDPRESS_DB_NAME=wordpress
+ENVIRONMENT_TYPE=PROD
+TZ=Europe/Paris
+UPLOAD_MAX=10 
+TIME_MAX=600
+MEMORY_MAX=128
+SSMTP_HOSTNAME=<%= @domain %>
+SSMTP_MAILHUB=wpsmtp
+SSMTP_AUTHUSER=noreply@<%= @domain %>
+SSMTP_AUTHPASSWD=<%= @noreply_pass_smtp %>

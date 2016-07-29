@@ -1,0 +1,21 @@
+version: "2"
+services:
+  ssh:
+    image: registry.teikhos.eu/ssh/tk-ssh:latest
+    container_name: tk_ssh
+    hostname: tk_ssh
+    logging:
+      driver: "none"
+    ports:
+      - "2223:22"
+    volumes:
+      - /home/services/tk_ssh/user.pub:/home/www/.ssh/keys/user.pub:ro
+      - /home/services/tk_ssh/user.pub:/home/user2/.ssh/keys/user.pub:ro
+      - /home/sites/<%= @fulldomain %>/web:/home/www/<%= @fulldomain %>/web
+      - /home/sites/<%= @fulldomain %>/log:/home/www/<%= @fulldomain %>/logs:ro
+      - /home/sites/<%= @fulldomain %>/archives:/home/www/<%= @fulldomain %>/files
+      - /home/sites/<%= @fulldomain %>/web:/home/user2/<%= @fulldomain %>/web
+      - /home/sites/<%= @fulldomain %>/log:/home/user2/<%= @fulldomain %>/logs:ro
+      - /home/sites/<%= @fulldomain %>/archives:/home/user2/<%= @fulldomain %>/files
+    command: www:<%= @www_pass_ssh %>:33:33 user2:<%= @www_pass_ssh %>:33:33
+    network_mode: bridge

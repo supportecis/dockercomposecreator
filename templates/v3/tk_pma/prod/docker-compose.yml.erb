@@ -1,0 +1,23 @@
+version: "2"
+services:
+  phpmyadmin:
+    image: registry.teikhos.eu/phpmyadmin/tk-debian-phpmyadmin:latest
+    container_name: tk_pma
+    hostname: tk_pma
+    logging:
+      driver: "none"
+    volumes:
+      - /home/services/tk_pma/config:/var/www/html/multiconfigs
+    # https si nécessaire
+    environment:      
+      - PMAABSOLUTEURI=https://pma.<%= @machine %>.<%= @clientname %>.as49517.net
+    restart: always
+    networks:
+      - main
+      - proxy
+# external name du network tkpma_main
+networks:
+  main:
+  proxy:
+    external:
+      name: tkapacheproxy_main

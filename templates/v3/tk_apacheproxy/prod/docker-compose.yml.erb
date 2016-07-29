@@ -1,0 +1,22 @@
+version: "2"
+services:
+  tk_apacheproxy:
+    image: registry.teikhos.eu/apache/tk-apache-proxy:2016072001
+    container_name: tk_proxy
+    hostname: tk_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/services/tk_apacheproxy/vhosts:/opt/proxy/vhosts/
+      - /home/services/tk_apacheproxy/certs:/etc/apache2/certs/
+      - /home/services/tk_apacheproxy/logs:/var/log/apache2/
+      - /home/services/tk_apacheproxy/letsencrypt:/etc/letsencrypt/
+    networks:
+      - main
+    restart: always
+    logging:
+      driver: none 
+# network external name : tkapacheproxy_main
+networks:
+  main:

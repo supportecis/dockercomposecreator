@@ -1,0 +1,84 @@
+version: "2"
+services:
+  wpnginx:
+    image: registry.teikhos.eu/nginx/tk-ubuntu-nginx:2016042101
+    depends_on:
+      - wpphpfpm
+    volumes_from:
+      - wpphpfpm
+    volumes:
+      - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+      - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+    env_file: wpnginx.env
+    restart: always    
+    logging:
+      driver: "syslog"
+      options:
+        syslog-tag: "<%= @project %>_web"      
+    networks:
+      proxy:
+        aliases:
+          - <%= @fulldomain %>.vhost
+      default:
+  wpphpfpm:
+    image: registry.teikhos.eu/fpm/tk-wordpress-fpm:2016041501
+    depends_on: 
+      - wpdb
+      - wpsmtp
+    volumes:
+      - /home/sites/<%= @fulldomain %>/web:/var/www/html
+      - /home/sites/<%= @fulldomain %>/conf/php:/php_conf
+      - /home/sites/<%= @fulldomain %>/log/php5:/var/log/php5
+    env_file:
+      - wpfpm.env
+      - wpsmtp.env
+    restart: always    
+    logging:
+      driver: "syslog"
+      options:
+        syslog-tag: "<%= @project %>_phpfpm"     
+  wpdb:
+    image: mariadb:10
+    volumes:
+      - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+    env_file: wpdb.env
+    restart: always    
+    logging:
+      driver: "none"
+    networks:
+      default:
+      phpmyadmin:
+        aliases:
+          - <%= @fulldomain %>.db  
+  wpsmtp:
+    image: registry.teikhos.eu/mail/tk-postfix:2015120901
+    volumes :
+      - /home/sites/<%= @fulldomain %>/log/mail:/var/log/postfix
+      - /home/sites/<%= @fulldomain %>/conf/mail:/config
+    env_file: wpsmtp.env
+    restart: always
+    logging:
+      driver: "none"    
+  wpdbbackup:
+    image: registry.teikhos.eu/database/tk-alpine-sqlbackup:latest
+    depends_on:
+      - wpdb
+      - wpsmtp
+    links:
+      - wpdb:hostdb
+      - wpsmtp:hostsmtp
+    volumes:
+      - /home/sites/<%= @fulldomain %>/dbbackups:/backups
+    env_file:
+      - wpdb.env
+      - wpbackup.env
+    restart: always
+    logging:
+      driver: "none"
+networks:
+  proxy:
+    external:
+      name: tkapacheproxy_main
+  phpmyadmin:
+    external:
+      name: tkpma_main

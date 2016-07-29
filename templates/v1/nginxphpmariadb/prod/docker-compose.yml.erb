@@ -1,0 +1,64 @@
+nginx:
+  image: docker-registry.teikhos.eu/tk-ubuntu-nginx:2015082501
+  links:
+    - phpfpm:php_fpm
+  volumes_from:
+    -  phpfpm
+  volumes:
+   - /home/sites/<%= @fulldomain %>/conf/nginx:/etc/nginx
+   - /home/sites/<%= @fulldomain %>/log/nginx:/var/log/nginx
+  env_file: web.env 
+  restart: always
+  log_driver: "syslog"
+  log_opt:
+    syslog-tag: "<%= @domain %>_web"
+phpfpm:
+  image: docker-registry.teikhos.eu/tk-ubuntu-fpm:vivid
+  volumes:
+    - /home/sites/<%= @fulldomain %>/web:/var/www/html
+    - /home/sites/<%= @fulldomain %>/conf/fpm:/etc/php5/fpm
+    - /home/sites/<%= @fulldomain %>/log/php5-fpm:/var/log/php5-fpm
+  links:
+   - postfix:smtp
+   - mariadb:sqldb
+  env_file: phpfpm.env
+  restart: always
+  log_driver: "syslog"
+  log_opt:
+    syslog-tag: "<%= @domain %>_fpm"
+postfix:
+  image: docker-registry.teikhos.eu/tk-postfix:2015120901
+  volumes :
+    - /home/sites/<%= @fulldomain %>/log/mail:/var/log/postfix
+    - /home/sites/<%= @fulldomain %>/conf/mail:/config
+  env_file: smtp.env
+  restart: always
+  log_driver: "none"
+mariadb:
+  image: mariadb:10
+  volumes_from:
+    - mariadbdata
+  env_file: db.env
+  restart: always
+  log_driver: "syslog"
+  log_opt:
+    syslog-tag: "<%= @domain %>_db"
+mariadbdata:
+  image: mariadb:10
+  command: echo "Image DATA pour MariaDB, afin de permettre la migration"
+  volumes:
+    - /home/sites/<%= @fulldomain %>/db:/var/lib/mysql
+  log_driver: "none"
+mariadbbackup:
+  image: docker-registry.teikhos.eu/tk-alpine-sqlbackup:latest
+  links:
+    - mariadb:hostdb
+    - postfix:hostsmtp
+  volumes: 
+    - /home/sites/<%= @fulldomain %>/dbbackups:/backups
+  env_file:
+    - db.env
+    - backup.env
+  hostname: backup_<%= @project %>
+  restart: always
+  log_driver: "none"

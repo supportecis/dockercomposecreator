@@ -10,8 +10,8 @@ docker run --rm -v "$PWD":/usr/src/app -w /usr/src/app ruby:alpine bundle instal
 echo "*************************"
 echo Build du dockerfile
 echo "*************************"
-docker build -t registry.teikhos.eu/misc/dcc:latest .
+docker build -t registry.gitlab.com/teikhos/dockercomposecreator .
 echo "*************************"
 echo Envoi sur la registry
 echo "*************************"
-docker push registry.teikhos.eu/misc/dcc:latest
+docker push registry.gitlab.com/teikhos/dockercomposecreator
